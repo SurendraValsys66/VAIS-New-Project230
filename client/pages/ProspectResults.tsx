@@ -1692,13 +1692,17 @@ export default function ProspectResults() {
                                       </Badge>
                                     </div>
                                   </div>
-                                  {hoveredRowId === prospect.id && (
-                                    <Sheet>
+                                  <Sheet>
                                       <SheetTrigger asChild>
                                         <Button
                                           variant="ghost"
                                           size="sm"
-                                          className="h-8 w-8 p-0 hover:bg-gray-200 flex-shrink-0"
+                                          className={cn(
+                                            "h-8 w-8 p-0 hover:bg-gray-200 flex-shrink-0",
+                                            hoveredRowId === prospect.id
+                                              ? "visible"
+                                              : "invisible"
+                                          )}
                                           aria-label="View prospect details"
                                           onClick={() =>
                                             setSelectedProspect(prospect)
@@ -1796,7 +1800,6 @@ export default function ProspectResults() {
                                         </div>
                                       </SheetContent>
                                     </Sheet>
-                                  )}
                                 </div>
                               </TableCell>
                             )}
