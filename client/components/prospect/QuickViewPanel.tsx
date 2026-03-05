@@ -277,49 +277,51 @@ export const QuickViewPanel: React.FC<QuickViewPanelProps> = ({
 
         {/* Company Details Card */}
         <Card title="Company Details" icon={<Building className="w-4 h-4" />}>
-          <div className="space-y-4">
+          <div className="space-y-5">
             {/* Company Name with Logo */}
-            <div className="flex gap-3 items-start">
+            <div className="flex gap-3 items-center">
               <div className="w-8 h-8 bg-cyan-500 rounded flex items-center justify-center flex-shrink-0">
-                <Building className="w-4 h-4 text-white" />
+                <div className="grid grid-cols-2 gap-1 p-1">
+                  <div className="w-1.5 h-1.5 bg-white rounded-sm"></div>
+                  <div className="w-1.5 h-1.5 bg-white rounded-sm"></div>
+                  <div className="w-1.5 h-1.5 bg-white rounded-sm"></div>
+                  <div className="w-1.5 h-1.5 bg-white rounded-sm"></div>
+                </div>
               </div>
-              <div className="flex-1">
-                <a
-                  href="#"
-                  className="text-sm font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1"
-                >
-                  {prospect.companyName}
-                  <ExternalLink className="w-3 h-3" />
-                </a>
-              </div>
+              <a
+                href="#"
+                className="text-sm font-semibold text-blue-600 hover:text-blue-700"
+              >
+                {prospect.companyName}
+              </a>
             </div>
 
             {/* Description */}
             <div>
-              <p className="text-xs text-gray-600 font-semibold mb-2 flex items-center gap-1">
-                <Briefcase className="w-3.5 h-3.5" />
-                Description
+              <div className="flex items-center gap-2 mb-2">
+                <Briefcase className="w-4 h-4 text-gray-600" />
+                <p className="text-xs text-gray-600 font-semibold">Description</p>
+              </div>
+              <p className="text-sm text-gray-700 ml-6">
+                {prospect.companyName} Health Solutions, founded in 2001 and headquartered in Fort Lauderdale, Florida...
               </p>
-              <p className="text-sm text-gray-700">
-                {prospect.companyName} is a leading company in their industry, providing innovative solutions.
-              </p>
-              <button className="text-sm text-blue-600 hover:text-blue-700 font-medium mt-2">
-                Show More
+              <button className="text-sm text-blue-600 hover:text-blue-700 font-medium mt-2 ml-6 flex items-center gap-1">
+                Show More <ChevronDown className="w-3 h-3" />
               </button>
             </div>
 
             {/* HQ Location */}
             {prospect.city && prospect.country && (
               <div>
-                <p className="text-xs text-gray-600 font-semibold mb-2 flex items-center gap-1">
-                  <MapPin className="w-3.5 h-3.5" />
-                  HQ Location
-                </p>
-                <div className="flex items-start justify-between gap-2">
+                <div className="flex items-center gap-2 mb-2">
+                  <MapPin className="w-4 h-4 text-gray-600" />
+                  <p className="text-xs text-gray-600 font-semibold">HQ Location</p>
+                </div>
+                <div className="flex items-start justify-between gap-2 ml-6">
                   <p className="text-sm text-gray-700">
                     {prospect.city}, {prospect.country}
                   </p>
-                  <MapPin className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" />
+                  <MapPin className="w-4 h-4 text-blue-500 flex-shrink-0" />
                 </div>
               </div>
             )}
@@ -327,57 +329,67 @@ export const QuickViewPanel: React.FC<QuickViewPanelProps> = ({
             {/* Employees */}
             {prospect.companySize && (
               <div>
-                <p className="text-xs text-gray-600 font-semibold mb-2 flex items-center gap-1">
-                  <Users className="w-3.5 h-3.5" />
-                  Employees
-                </p>
-                <p className="text-sm text-gray-900">{prospect.companySize}</p>
+                <div className="flex items-center gap-2 mb-2">
+                  <Users className="w-4 h-4 text-gray-600" />
+                  <p className="text-xs text-gray-600 font-semibold">Employees</p>
+                </div>
+                <p className="text-sm text-blue-600 font-medium ml-6">{prospect.companySize}</p>
               </div>
             )}
 
             {/* Revenue */}
             {prospect.revenue && (
               <div>
-                <p className="text-xs text-gray-600 font-semibold mb-2 flex items-center gap-1">
-                  <DollarSign className="w-3.5 h-3.5" />
-                  Revenue
-                </p>
-                <p className="text-sm text-gray-900">{prospect.revenue}</p>
+                <div className="flex items-center gap-2 mb-2">
+                  <DollarSign className="w-4 h-4 text-gray-600" />
+                  <p className="text-xs text-gray-600 font-semibold">Revenue</p>
+                </div>
+                <p className="text-sm text-gray-900 font-medium ml-6">{prospect.revenue}</p>
               </div>
             )}
 
             {/* Industry */}
             {prospect.industry && (
               <div>
-                <p className="text-xs text-gray-600 font-semibold mb-2 flex items-center gap-1">
-                  <Briefcase className="w-3.5 h-3.5" />
-                  Industry
+                <div className="flex items-center gap-2 mb-2">
+                  <Briefcase className="w-4 h-4 text-gray-600" />
+                  <p className="text-xs text-gray-600 font-semibold">Industry</p>
+                </div>
+                <div className="ml-6 space-y-1">
+                  <p className="text-xs text-gray-600">Primary Industries</p>
+                  <p className="text-sm text-gray-700 font-medium">{prospect.industry}</p>
+                  <p className="text-xs text-gray-600 mt-2">Additional Industries</p>
+                  <p className="text-sm text-gray-700 font-medium">Healthcare Services</p>
+                </div>
+              </div>
+            )}
+
+            {/* Technologies */}
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <Globe className="w-4 h-4 text-gray-600" />
+                <p className="text-xs text-gray-600 font-semibold">Technologies</p>
+              </div>
+              <div className="ml-6 space-y-1">
+                <p className="text-sm text-gray-700">
+                  API Management, Ad Exchanges, Advertising Networks, Applicant Tracking Systems...
                 </p>
-                <p className="text-sm text-gray-700 mb-1">{prospect.industry}</p>
                 <button className="text-sm text-blue-600 hover:text-blue-700 font-medium">
                   See all
                 </button>
               </div>
-            )}
+            </div>
 
-            {/* Job Function */}
-            {prospect.jobFunction && (
-              <div>
-                <p className="text-xs text-gray-600 font-semibold mb-2">Function</p>
-                <p className="text-sm text-gray-900">{prospect.jobFunction}</p>
-              </div>
-            )}
-
-            {/* Phone */}
+            {/* HQ Phone */}
             {prospect.phone && (
               <div>
-                <p className="text-xs text-gray-600 font-semibold mb-2 flex items-center gap-1">
-                  <Phone className="w-3.5 h-3.5" />
-                  HQ Phone
-                </p>
+                <div className="flex items-center gap-2 mb-2">
+                  <Phone className="w-4 h-4 text-gray-600" />
+                  <p className="text-xs text-gray-600 font-semibold">HQ Phone</p>
+                </div>
                 <a
                   href={`tel:${prospect.phone}`}
-                  className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                  className="text-sm text-blue-600 hover:text-blue-700 font-medium ml-6"
                 >
                   {prospect.phone} <span className="text-gray-600 font-normal">(HQ)</span>
                 </a>
