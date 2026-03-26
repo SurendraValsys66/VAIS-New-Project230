@@ -125,6 +125,53 @@ export const ComponentRenderer: React.FC<RendererProps> = ({
     );
   };
 
+  const getComponentStyles = () => {
+    const styles: React.CSSProperties = {};
+
+    // Apply width (with unit support)
+    if (component.width) {
+      const unit = component.widthUnit || "%";
+      styles.width = `${component.width}${unit}`;
+    }
+
+    // Apply height (minHeight for flexibility)
+    if (component.height) {
+      const unit = component.heightUnit || "px";
+      styles.minHeight = `${component.height}${unit}`;
+    }
+
+    // Apply padding
+    if (component.padding) {
+      styles.padding = `${component.padding}px`;
+    }
+
+    // Apply margin
+    if (component.margin) {
+      styles.margin = `${component.margin}px`;
+    }
+
+    // Apply border properties
+    if (component.borderWidth) {
+      styles.borderWidth = `${component.borderWidth}px`;
+      styles.borderStyle = "solid";
+    }
+
+    if (component.borderColor) {
+      styles.borderColor = component.borderColor;
+    }
+
+    if (component.borderRadius) {
+      styles.borderRadius = `${component.borderRadius}px`;
+    }
+
+    // Apply background color
+    if (component.backgroundColor) {
+      styles.backgroundColor = component.backgroundColor;
+    }
+
+    return styles;
+  };
+
   const wrapWithControls = (content: React.ReactNode) => {
     return (
       <div
@@ -144,8 +191,7 @@ export const ComponentRenderer: React.FC<RendererProps> = ({
         style={{
           ...(component.type === "column"
             ? { flex: `0 0 ${((component.width || 12) / 12) * 100}%`, padding: "0 0.5rem" }
-            : {}),
-          ...(component.height ? { minHeight: `${component.height}px` } : {}),
+            : getComponentStyles()),
         }}
       >
         {isSelected && (
@@ -224,9 +270,13 @@ export const ComponentRenderer: React.FC<RendererProps> = ({
       return wrapWithControls(
         <div className="p-4 h-full flex items-center">
           <h2
-            className="text-3xl font-bold w-full leading-tight text-gray-900"
+            className="text-3xl font-bold w-full leading-tight"
             contentEditable
             suppressContentEditableWarning
+            style={{
+              color: component.textColor || "#111827",
+              fontSize: component.fontSize ? `${component.fontSize}${component.fontSizeUnit || "px"}` : undefined,
+            }}
           >
             Catchy Heading
           </h2>
@@ -236,9 +286,13 @@ export const ComponentRenderer: React.FC<RendererProps> = ({
       return wrapWithControls(
         <div className="p-4 h-full">
           <p
-            className="text-base text-gray-600 leading-relaxed"
+            className="text-base leading-relaxed"
             contentEditable
             suppressContentEditableWarning
+            style={{
+              color: component.textColor || "#4b5563",
+              fontSize: component.fontSize ? `${component.fontSize}${component.fontSizeUnit || "px"}` : undefined,
+            }}
           >
             Add your description text here. Make it compelling and easy to read for your visitors.
           </p>
@@ -247,7 +301,14 @@ export const ComponentRenderer: React.FC<RendererProps> = ({
     case "button":
       return wrapWithControls(
         <div className="p-4 h-full flex items-center justify-start">
-          <Button className="px-8 py-6 text-lg font-semibold rounded-xl shadow-lg bg-valasys-orange hover:bg-valasys-orange/90">
+          <Button
+            className="px-8 py-6 text-lg font-semibold rounded-xl shadow-lg"
+            style={{
+              backgroundColor: component.backgroundColor || "#ea580c",
+              color: component.textColor || "#ffffff",
+              fontSize: component.fontSize ? `${component.fontSize}${component.fontSizeUnit || "px"}` : undefined,
+            }}
+          >
             Get Started
           </Button>
         </div>,

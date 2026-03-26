@@ -79,6 +79,13 @@ export const ElementStylePanel: React.FC<ElementStylePanelProps> = ({
         borderColor: component.borderColor || "#000000",
         borderWidth: component.borderWidth ? String(component.borderWidth) : "0",
       });
+
+      // Initialize units from component
+      setSizingUnits({
+        width: component.widthUnit || "%",
+        height: component.heightUnit || "px",
+        fontSize: component.fontSizeUnit || "px",
+      });
     }
   }, [component?.id]); // Only update when component ID changes
 
@@ -138,13 +145,12 @@ export const ElementStylePanel: React.FC<ElementStylePanelProps> = ({
         [property]: newUnit,
       }));
 
-      // Update the component with the unit in the value
-      const value = styles[property];
+      // Update the component with the unit
       const updates: any = {};
-      updates[property] = value; // Value is just the number, unit is applied in CSS
+      updates[`${property}Unit`] = newUnit; // Store the unit (widthUnit, heightUnit, fontSizeUnit)
       onUpdate(updates);
     },
-    [styles, onUpdate]
+    [onUpdate]
   );
 
   const toggleSection = React.useCallback(
