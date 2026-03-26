@@ -31,7 +31,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ onBack, templateId
       ? templateLayoutMap[templateId] || DEFAULT_LAYOUT
       : DEFAULT_LAYOUT;
 
-  const { layout, addComponent, moveComponent, updateComponent, removeComponent } = useLayout(
+  const { layout, addComponent, moveComponent, updateComponent, removeComponent, duplicateComponent } = useLayout(
     layoutConfig,
   );
 
@@ -119,6 +119,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ onBack, templateId
                 onRemove={() => {}}
                 onMove={() => {}}
                 onAdd={() => {}}
+                onDuplicate={() => {}}
                 onSelect={() => {}}
                 isSelected={false}
               />
@@ -219,16 +220,23 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ onBack, templateId
           >
             {layout.length > 0 ? (
               <div className="space-y-4">
-                {layout.map((comp) => (
+                {layout.map((comp, index) => (
                   <ComponentRenderer
                     key={comp.id}
                     component={comp}
                     onUpdate={updateComponent}
                     onRemove={removeComponent}
                     onMove={moveComponent}
-                    onAdd={addComponent}
+                    onAdd={(type, parentId, idx) => {
+                      addComponent(type, parentId, idx, (newId) => {
+                        setSelectedComponentId(newId);
+                      });
+                    }}
+                    onDuplicate={duplicateComponent}
                     onSelect={setSelectedComponentId}
                     isSelected={selectedComponentId === comp.id}
+                    parentId={null}
+                    parentIndex={index}
                   />
                 ))}
               </div>

@@ -12,6 +12,8 @@ import {
   Star,
   Quote,
   ChevronDown,
+  Copy,
+  Plus,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -21,8 +23,11 @@ interface RendererProps {
   onRemove: (id: string) => void;
   onMove: (id: string, targetParentId: string | null, targetIndex: number) => void;
   onAdd: (type: ComponentType, parentId: string | null, index?: number) => void;
+  onDuplicate: (id: string) => void;
   onSelect?: (id: string) => void;
   isSelected?: boolean;
+  parentId?: string | null;
+  parentIndex?: number;
 }
 
 export const ComponentRenderer: React.FC<RendererProps> = ({
@@ -31,9 +36,21 @@ export const ComponentRenderer: React.FC<RendererProps> = ({
   onRemove,
   onMove,
   onAdd,
+  onDuplicate,
   onSelect,
   isSelected,
+  parentId,
+  parentIndex,
 }) => {
+  const handleCopyComponent = () => {
+    onDuplicate(component.id);
+  };
+
+  const handleAddSibling = () => {
+    // Add as a sibling at the same level, not as a child
+    onAdd(component.type, parentId || null, (parentIndex || 0) + 1);
+  };
+
   const [{ isDragging }, drag] = useDrag({
     type: DRAG_TYPES.COMPONENT,
     item: { id: component.id, type: component.type },
@@ -84,7 +101,7 @@ export const ComponentRenderer: React.FC<RendererProps> = ({
           component.type === "column" && "p-2 h-full flex flex-col gap-2",
         )}
       >
-        {component.children?.map((child) => (
+        {component.children?.map((child, childIndex) => (
           <ComponentRenderer
             key={child.id}
             component={child}
@@ -92,8 +109,11 @@ export const ComponentRenderer: React.FC<RendererProps> = ({
             onRemove={onRemove}
             onMove={onMove}
             onAdd={onAdd}
+            onDuplicate={onDuplicate}
             onSelect={onSelect}
             isSelected={isSelected && component.id === child.id}
+            parentId={component.id}
+            parentIndex={childIndex}
           />
         ))}
         {component.children?.length === 0 && (
@@ -106,18 +126,6 @@ export const ComponentRenderer: React.FC<RendererProps> = ({
   };
 
   const wrapWithControls = (content: React.ReactNode) => {
-    const isResizable = [
-      "section",
-      "image",
-      "video",
-      "hero",
-      "feature-grid",
-      "pricing",
-      "testimonials",
-      "faq",
-      "card",
-    ].includes(component.type);
-
     return (
       <div
         ref={drag}
@@ -129,7 +137,9 @@ export const ComponentRenderer: React.FC<RendererProps> = ({
           "group relative rounded-md transition-all cursor-pointer",
           isDragging && "opacity-30",
           component.type === "column" && "w-full md:w-auto h-full",
-          isSelected ? "border-2 border-valasys-orange shadow-lg shadow-valasys-orange/20" : "border border-transparent hover:border-valasys-orange",
+          isSelected
+            ? "border-2 border-valasys-orange shadow-lg shadow-valasys-orange/20 element-selected-pulse"
+            : "border-2 border-transparent hover:border-valasys-orange hover:border-dashed",
         )}
         style={{
           ...(component.type === "column"
@@ -138,73 +148,50 @@ export const ComponentRenderer: React.FC<RendererProps> = ({
           ...(component.height ? { minHeight: `${component.height}px` } : {}),
         }}
       >
-        <div className="absolute top-0 right-0 opacity-0 group-hover:opacity-100 flex items-center bg-valasys-orange rounded-bl-md text-white px-1 z-30 transition-opacity">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-6 w-6 text-white hover:text-white hover:bg-valasys-orange/90"
-            onClick={() => onRemove(component.id)}
-          >
-            <Trash2 className="h-3.5 w-3.5" />
-          </Button>
-          <div className="h-6 w-6 flex items-center justify-center cursor-move">
-            <Move className="h-3.5 w-3.5" />
-          </div>
-        </div>
-
-        {component.type === "column" && (
-          <div className="absolute bottom-0 left-0 right-0 opacity-0 group-hover:opacity-100 flex items-center justify-between bg-valasys-orange/5 px-2 py-1 z-20 text-[10px] font-bold text-valasys-orange pointer-events-none">
-            <div className="flex items-center gap-1 pointer-events-auto">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-5 w-5 bg-white border shadow-sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onUpdate(component.id, { width: Math.max(1, (component.width || 12) - 1) });
-                }}
-              >
-                <ChevronLeft className="h-3 w-3" />
-              </Button>
-              <span>{component.width}/12</span>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-5 w-5 bg-white border shadow-sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onUpdate(component.id, { width: Math.min(12, (component.width || 1) + 1) });
-                }}
-              >
-                <ChevronRight className="h-3 w-3" />
-              </Button>
+        {isSelected && (
+          <div className="absolute top-0 right-0 flex items-center gap-1 bg-white rounded-bl-md text-valasys-orange px-1 py-1 z-30 shadow-lg border border-valasys-orange/20">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6 hover:bg-valasys-orange/10"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleCopyComponent();
+              }}
+              title="Copy element"
+            >
+              <Copy className="h-3.5 w-3.5" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6 hover:bg-valasys-orange/10"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleAddSibling();
+              }}
+              title="Add element"
+            >
+              <Plus className="h-3.5 w-3.5" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6 hover:bg-red-100 text-red-500"
+              onClick={(e) => {
+                e.stopPropagation();
+                onRemove(component.id);
+              }}
+              title="Delete element"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+            </Button>
+            <div className="h-6 w-6 flex items-center justify-center cursor-move hover:bg-valasys-orange/10 rounded">
+              <Move className="h-3.5 w-3.5" />
             </div>
           </div>
         )}
 
-        {isResizable && (
-          <div
-            className="absolute bottom-0 left-0 right-0 h-1.5 cursor-ns-resize opacity-0 group-hover:opacity-100 bg-valasys-orange/30 hover:bg-valasys-orange transition-all z-20"
-            onMouseDown={(e) => {
-              e.preventDefault();
-              const startY = e.clientY;
-              const startHeight = component.height || (component.type === "section" ? 200 : 100);
-
-              const onMouseMove = (moveEvent: MouseEvent) => {
-                const newHeight = Math.max(50, startHeight + (moveEvent.clientY - startY));
-                onUpdate(component.id, { height: newHeight });
-              };
-
-              const onMouseUp = () => {
-                window.removeEventListener("mousemove", onMouseMove);
-                window.removeEventListener("mouseup", onMouseUp);
-              };
-
-              window.addEventListener("mousemove", onMouseMove);
-              window.addEventListener("mouseup", onMouseUp);
-            }}
-          />
-        )}
 
         {content}
       </div>

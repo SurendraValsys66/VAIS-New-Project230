@@ -5,7 +5,7 @@ export const useLayout = (initialData: BuilderComponent[] = []) => {
   const [layout, setLayout] = useState<BuilderComponent[]>(initialData);
 
   const addComponent = useCallback(
-    (type: ComponentType, parentId: string | null = null, index?: number) => {
+    (type: ComponentType, parentId: string | null = null, index?: number, onAdded?: (id: string) => void) => {
       const newComponent: BuilderComponent = {
         id: Math.random().toString(36).substr(2, 9),
         type,
@@ -14,6 +14,11 @@ export const useLayout = (initialData: BuilderComponent[] = []) => {
         width: type === "column" ? 6 : undefined,
         height: ["section", "image", "card", "hero", "feature-grid", "pricing", "testimonials", "faq", "video"].includes(type) ? 200 : undefined,
       };
+
+      // Call the onAdded callback with the new component ID
+      if (onAdded) {
+        onAdded(newComponent.id);
+      }
 
       const addToChildren = (
         components: BuilderComponent[],
@@ -143,5 +148,50 @@ export const useLayout = (initialData: BuilderComponent[] = []) => {
     setLayout((prev) => removeFromTree(prev));
   }, []);
 
-  return { layout, addComponent, moveComponent, updateComponent, removeComponent };
+  const duplicateComponent = useCallback((id: string) => {
+    const findAndDuplicate = (
+      components: BuilderComponent[],
+      parentId: string | null = null,
+    ): { components: BuilderComponent[]; duplicated: boolean } => {
+      let duplicated = false;
+
+      const newComponents = components.map((comp) => {
+        if (comp.id === id) {
+          duplicated = true;
+          // Create a deep copy of the component
+          const duplicate: BuilderComponent = {
+            ...comp,
+            id: Math.random().toString(36).substr(2, 9),
+            children: comp.children ? comp.children.map(deepCloneComponent) : comp.children,
+          };
+          return duplicate;
+        }
+        if (comp.children) {
+          const result = findAndDuplicate(comp.children, comp.id);
+          if (result.duplicated) {
+            duplicated = true;
+            return { ...comp, children: result.components };
+          }
+        }
+        return comp;
+      });
+
+      return { components: newComponents, duplicated };
+    };
+
+    const deepCloneComponent = (comp: BuilderComponent): BuilderComponent => {
+      return {
+        ...comp,
+        id: Math.random().toString(36).substr(2, 9),
+        children: comp.children ? comp.children.map(deepCloneComponent) : comp.children,
+      };
+    };
+
+    setLayout((prev) => {
+      const result = findAndDuplicate(prev);
+      return result.components;
+    });
+  }, []);
+
+  return { layout, addComponent, moveComponent, updateComponent, removeComponent, duplicateComponent };
 };
