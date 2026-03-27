@@ -436,28 +436,6 @@ export const ComponentRenderer: React.FC<RendererProps> = ({
       return wrapWithControls(
         <div className="p-4 h-full flex items-center justify-start">
           <button
-            contentEditable
-            suppressContentEditableWarning
-            onFocus={(e) => {
-              // Clear default text when user focuses to edit
-              if (e.currentTarget.textContent === "Get Started" && !component.contentText) {
-                e.currentTarget.textContent = "";
-              }
-            }}
-            onInput={(e) => {
-              const text = e.currentTarget.textContent || "";
-              onUpdate(component.id, { contentText: text });
-            }}
-            onBlur={(e) => {
-              const text = e.currentTarget.textContent || "";
-              // Restore default if empty
-              if (!text) {
-                e.currentTarget.textContent = "Get Started";
-                onUpdate(component.id, { contentText: "" });
-              } else {
-                onUpdate(component.id, { contentText: text });
-              }
-            }}
             className="px-8 py-6 text-lg font-semibold rounded-xl shadow-lg focus:outline-none focus:ring-0"
             style={{
               backgroundColor: component.backgroundColor || "#ea580c",
