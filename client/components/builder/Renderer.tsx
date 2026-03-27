@@ -434,13 +434,14 @@ export const ComponentRenderer: React.FC<RendererProps> = ({
       );
     case "button": {
       const buttonRef = React.useRef<HTMLButtonElement>(null);
-      const [isEditing, setIsEditing] = React.useState(false);
+      const hasInitializedRef = React.useRef(false);
 
       React.useEffect(() => {
-        if (buttonRef.current) {
+        if (buttonRef.current && !hasInitializedRef.current) {
           buttonRef.current.textContent = component.contentText || "Get Started";
+          hasInitializedRef.current = true;
         }
-      }, [component.contentText, isEditing]);
+      }, []);
 
       return wrapWithControls(
         <div className="p-4 h-full flex items-center justify-start">
@@ -449,13 +450,11 @@ export const ComponentRenderer: React.FC<RendererProps> = ({
             contentEditable
             suppressContentEditableWarning
             onFocus={(e) => {
-              setIsEditing(true);
-              // Select all text when focusing for easier editing
-              const selection = window.getSelection();
-              const range = document.createRange();
-              range.selectNodeContents(e.currentTarget);
-              selection?.removeAllRanges();
-              selection?.addRange(range);
+              const currentText = e.currentTarget.textContent || "";
+              // Clear default text when user focuses to edit
+              if (currentText === "Get Started" && !component.contentText) {
+                e.currentTarget.textContent = "";
+              }
             }}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
@@ -468,11 +467,10 @@ export const ComponentRenderer: React.FC<RendererProps> = ({
               onUpdate(component.id, { contentText: text });
             }}
             onBlur={(e) => {
-              setIsEditing(false);
               const text = e.currentTarget.textContent || "";
               if (!text) {
-                onUpdate(component.id, { contentText: "" });
                 e.currentTarget.textContent = "Get Started";
+                onUpdate(component.id, { contentText: "" });
               }
             }}
             className="px-8 py-6 text-lg font-semibold rounded-xl shadow-lg focus:outline-none focus:ring-0"
