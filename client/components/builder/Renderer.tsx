@@ -244,7 +244,7 @@ export const ComponentRenderer: React.FC<RendererProps> = ({
           component.type === "column" && "w-full md:w-auto h-full",
           isSelected
             ? "border-2 border-valasys-orange shadow-lg shadow-valasys-orange/20 element-selected-pulse"
-            : "border-2 border-transparent hover:border-valasys-orange hover:border-dashed",
+            : "border-2 border-transparent hover:border-2 hover:border-dashed hover:border-valasys-orange",
         )}
         style={{
           ...(component.type === "column"
@@ -345,47 +345,138 @@ export const ComponentRenderer: React.FC<RendererProps> = ({
       return wrapWithControls(
         <div className="p-4 h-full flex items-center" style={getComponentStyles()}>
           <h2
-            className="text-3xl font-bold w-full leading-tight"
+            className="w-full focus:outline-none focus:ring-0"
             contentEditable
             suppressContentEditableWarning
+            onFocus={(e) => {
+              // Clear default text when user focuses to edit
+              if (e.currentTarget.textContent === "Catchy Heading" && !component.contentText) {
+                e.currentTarget.textContent = "";
+              }
+            }}
+            onInput={(e) => {
+              const text = e.currentTarget.textContent || "";
+              onUpdate(component.id, { contentText: text });
+            }}
+            onBlur={(e) => {
+              const text = e.currentTarget.textContent || "";
+              // Restore default if empty
+              if (!text) {
+                e.currentTarget.textContent = "Catchy Heading";
+                onUpdate(component.id, { contentText: "" });
+              } else {
+                onUpdate(component.id, { contentText: text });
+              }
+            }}
             style={{
               color: component.textColor || "#111827",
               fontSize: component.fontSize ? `${component.fontSize}${component.fontSizeUnit || "px"}` : undefined,
+              fontWeight: component.fontWeight || "700",
+              lineHeight: component.lineHeight || "1.5",
+              letterSpacing: component.letterSpacing ? `${component.letterSpacing}px` : "0",
+              fontFamily: component.fontFamily === "serif" ? "Georgia, serif" :
+                         component.fontFamily === "mono" ? "Courier New, monospace" :
+                         "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif",
+              outline: "none !important",
+              border: "none !important",
+              boxShadow: "none !important",
             }}
           >
-            Catchy Heading
+            {component.contentText || "Catchy Heading"}
           </h2>
         </div>,
       );
     case "paragraph":
+      const defaultParaText = "Add your description text here. Make it compelling and easy to read for your visitors.";
       return wrapWithControls(
         <div className="p-4 h-full" style={getComponentStyles()}>
           <p
-            className="text-base leading-relaxed"
+            className="focus:outline-none focus:ring-0"
             contentEditable
             suppressContentEditableWarning
+            onFocus={(e) => {
+              // Clear default text when user focuses to edit
+              if (e.currentTarget.textContent === defaultParaText && !component.contentText) {
+                e.currentTarget.textContent = "";
+              }
+            }}
+            onInput={(e) => {
+              const text = e.currentTarget.textContent || "";
+              onUpdate(component.id, { contentText: text });
+            }}
+            onBlur={(e) => {
+              const text = e.currentTarget.textContent || "";
+              // Restore default if empty
+              if (!text) {
+                e.currentTarget.textContent = defaultParaText;
+                onUpdate(component.id, { contentText: "" });
+              } else {
+                onUpdate(component.id, { contentText: text });
+              }
+            }}
             style={{
               color: component.textColor || "#4b5563",
               fontSize: component.fontSize ? `${component.fontSize}${component.fontSizeUnit || "px"}` : undefined,
+              fontWeight: component.fontWeight || "400",
+              lineHeight: component.lineHeight || "1.5",
+              letterSpacing: component.letterSpacing ? `${component.letterSpacing}px` : "0",
+              fontFamily: component.fontFamily === "serif" ? "Georgia, serif" :
+                         component.fontFamily === "mono" ? "Courier New, monospace" :
+                         "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif",
+              outline: "none !important",
+              border: "none !important",
+              boxShadow: "none !important",
             }}
           >
-            Add your description text here. Make it compelling and easy to read for your visitors.
+            {component.contentText || defaultParaText}
           </p>
         </div>,
       );
     case "button":
       return wrapWithControls(
         <div className="p-4 h-full flex items-center justify-start">
-          <Button
-            className="px-8 py-6 text-lg font-semibold rounded-xl shadow-lg"
+          <button
+            contentEditable
+            suppressContentEditableWarning
+            onFocus={(e) => {
+              // Clear default text when user focuses to edit
+              if (e.currentTarget.textContent === "Get Started" && !component.contentText) {
+                e.currentTarget.textContent = "";
+              }
+            }}
+            onInput={(e) => {
+              const text = e.currentTarget.textContent || "";
+              onUpdate(component.id, { contentText: text });
+            }}
+            onBlur={(e) => {
+              const text = e.currentTarget.textContent || "";
+              // Restore default if empty
+              if (!text) {
+                e.currentTarget.textContent = "Get Started";
+                onUpdate(component.id, { contentText: "" });
+              } else {
+                onUpdate(component.id, { contentText: text });
+              }
+            }}
+            className="px-8 py-6 text-lg font-semibold rounded-xl shadow-lg focus:outline-none focus:ring-0"
             style={{
               backgroundColor: component.backgroundColor || "#ea580c",
               color: component.textColor || "#ffffff",
               fontSize: component.fontSize ? `${component.fontSize}${component.fontSizeUnit || "px"}` : undefined,
+              fontWeight: component.fontWeight || "600",
+              lineHeight: component.lineHeight || "1.5",
+              letterSpacing: component.letterSpacing ? `${component.letterSpacing}px` : "0",
+              fontFamily: component.fontFamily === "serif" ? "Georgia, serif" :
+                         component.fontFamily === "mono" ? "Courier New, monospace" :
+                         "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif",
+              outline: "none !important",
+              border: "none !important",
+              boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1) !important",
+              cursor: "pointer",
             }}
           >
-            Get Started
-          </Button>
+            {component.contentText || "Get Started"}
+          </button>
         </div>,
       );
     case "image":
