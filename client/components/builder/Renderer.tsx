@@ -436,6 +436,28 @@ export const ComponentRenderer: React.FC<RendererProps> = ({
       return wrapWithControls(
         <div className="p-4 h-full flex items-center justify-start">
           <button
+            contentEditable
+            suppressContentEditableWarning
+            onMouseDown={(e) => {
+              // Prevent selection issues on click
+              e.preventDefault();
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                (e.currentTarget as any).blur();
+              }
+            }}
+            onInput={(e) => {
+              const text = e.currentTarget.textContent || "";
+              onUpdate(component.id, { contentText: text });
+            }}
+            onBlur={(e) => {
+              const text = e.currentTarget.textContent || "";
+              if (!text) {
+                e.currentTarget.textContent = component.contentText || "Get Started";
+              }
+            }}
             className="px-8 py-6 text-lg font-semibold rounded-xl shadow-lg focus:outline-none focus:ring-0"
             style={{
               backgroundColor: component.backgroundColor || "#ea580c",
