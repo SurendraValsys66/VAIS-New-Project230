@@ -196,6 +196,25 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
     const isSelected = selectedElementId === element.id;
     const isHovered = hoveredElementId === element.id;
 
+    // Get the actual value - in edit mode show the real value even if empty, in display mode show with fallback
+    const getDisplayContent = (elementId: string): string => {
+      const valueMap: Record<string, string | undefined> = {
+        badge: component.heroBadgeText,
+        heading: component.heroHeadingText,
+        paragraph: component.heroDescriptionText,
+      };
+      return valueMap[elementId] || "";
+    };
+
+    const getDefaultContent = (elementId: string): string => {
+      const defaults: Record<string, string> = {
+        badge: "✨ New Release",
+        heading: "Build your vision faster than ever.",
+        paragraph: "The world's most advanced landing page builder. Drag, drop, and launch in minutes, not days.",
+      };
+      return defaults[elementId] || "";
+    };
+
     const borderClasses = cn(
       "transition-all",
       isSelected && "border-2 border-solid border-valasys-orange",
@@ -265,6 +284,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
 
     switch (element.type) {
       case "badge":
+        const badgeContent = isSelected ? getDisplayContent("badge") : (element.content || getDefaultContent("badge"));
         return (
           <div
             key={element.id}
@@ -280,7 +300,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-valasys-orange/10 text-valasys-orange text-xs font-bold uppercase tracking-wider">
               {isSelected ? (
                 <Input
-                  value={element.content}
+                  value={badgeContent}
                   data-element-id={element.id}
                   onChange={(e) => handleElementUpdate(element.id, e.target.value)}
                   onFocus={handleEditableFocus}
@@ -298,7 +318,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                     whiteSpace: "normal",
                   }}
                 >
-                  {element.content}
+                  {badgeContent}
                 </span>
               )}
             </div>
@@ -307,6 +327,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
         );
 
       case "heading":
+        const headingContent = isSelected ? getDisplayContent("heading") : (element.content || getDefaultContent("heading"));
         return (
           <div
             key={element.id}
@@ -318,7 +339,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             {isSelected ? (
               <Textarea
                 ref={headingTextareaRef}
-                value={element.content}
+                value={headingContent}
                 data-element-id={element.id}
                 onChange={(e) => {
                   handleElementUpdate(element.id, e.target.value);
@@ -340,7 +361,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                   whiteSpace: "normal",
                 }}
               >
-                {element.content}
+                {headingContent}
               </h1>
             )}
             {renderControls()}
@@ -348,6 +369,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
         );
 
       case "paragraph":
+        const paragraphContent = isSelected ? getDisplayContent("paragraph") : (element.content || getDefaultContent("paragraph"));
         return (
           <div
             key={element.id}
@@ -359,7 +381,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             {isSelected ? (
               <Textarea
                 ref={paragraphTextareaRef}
-                value={element.content}
+                value={paragraphContent}
                 data-element-id={element.id}
                 onChange={(e) => {
                   handleElementUpdate(element.id, e.target.value);
@@ -381,7 +403,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                   whiteSpace: "normal",
                 }}
               >
-                {element.content}
+                {paragraphContent}
               </p>
             )}
             {renderControls()}
@@ -400,12 +422,13 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             <div className="flex flex-wrap items-center justify-center gap-4 mt-4">
               {isSelected ? (
                 <Input
-                  value={component.heroPrimaryButtonText || "Start Free Trial"}
+                  value={component.heroPrimaryButtonText}
                   data-element-id="primaryButton"
                   onChange={(e) => handleElementUpdate("primaryButton", e.target.value)}
                   onFocus={handleEditableFocus}
                   onBlur={() => setEditingElementId(null)}
                   onClick={(e) => e.stopPropagation()}
+                  placeholder="Start Free Trial"
                   className="h-auto min-w-[220px] rounded-2xl border-0 bg-valasys-orange px-10 py-7 text-center text-lg font-bold text-white shadow-xl focus-visible:ring-0 focus-visible:ring-offset-0"
                 />
               ) : (
@@ -415,12 +438,13 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               )}
               {isSelected ? (
                 <Input
-                  value={component.heroSecondaryButtonText || "Watch Demo"}
+                  value={component.heroSecondaryButtonText}
                   data-element-id="secondaryButton"
                   onChange={(e) => handleElementUpdate("secondaryButton", e.target.value)}
                   onFocus={handleEditableFocus}
                   onBlur={() => setEditingElementId(null)}
                   onClick={(e) => e.stopPropagation()}
+                  placeholder="Watch Demo"
                   className="h-auto min-w-[180px] rounded-2xl border border-gray-200 bg-white px-10 py-7 text-center text-lg font-bold text-gray-900 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
                 />
               ) : (
