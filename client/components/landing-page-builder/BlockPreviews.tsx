@@ -449,7 +449,7 @@ export const PricingBlockPreview: React.FC<BlockPreviewProps> = ({
               ? "3px solid #FF6A00"
               : hoveredElement === "heading"
               ? "3px dashed #FF6A00"
-              : "1px solid transparent",
+              : "1px solid #f0f0f0",
           }}
           onMouseEnter={(e) => {
             e.stopPropagation();
@@ -491,7 +491,7 @@ export const PricingBlockPreview: React.FC<BlockPreviewProps> = ({
               ? "3px solid #FF6A00"
               : hoveredElement === "subheading"
               ? "3px dashed #FF6A00"
-              : "1px solid transparent",
+              : "1px solid #f0f0f0",
           }}
           onMouseEnter={(e) => {
             e.stopPropagation();
