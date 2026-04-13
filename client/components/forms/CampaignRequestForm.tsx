@@ -692,6 +692,18 @@ function DeliverablesDialog({
             </div>
           </div>
 
+          {/* Recommended Campaign Type Section - Positioned Above Tables */}
+          <RecommendedCampaignType
+            jobTitles={jobTitles}
+            jobFunctions={jobFunctions}
+            jobLevels={jobLevels}
+            geolocations={geolocations}
+            employeeSize={employeeSize}
+            industries={industries}
+            totalDeliverables={totalDeliverables}
+            campaignAssets={selectedAssets}
+          />
+
           <Accordion type="single" collapsible defaultValue="item-1" className="w-full space-y-6">
             {/* 1) Quarterly Deliverables */}
             <AccordionItem value="item-1" className="border-none rounded-2xl overflow-hidden bg-white shadow-sm ring-1 ring-gray-200 transition-all hover:ring-blue-200">
@@ -942,18 +954,6 @@ function DeliverablesDialog({
           </Accordion>
 
           <div className="pt-4 pb-8 space-y-8">
-            {/* Recommended Campaign Type Section */}
-            <RecommendedCampaignType
-              jobTitles={jobTitles}
-              jobFunctions={jobFunctions}
-              jobLevels={jobLevels}
-              geolocations={geolocations}
-              employeeSize={employeeSize}
-              industries={industries}
-              totalDeliverables={totalDeliverables}
-              campaignAssets={selectedAssets}
-            />
-
             {/* Campaign Actions */}
             {userHasFullPermission && (
               <div className="bg-white rounded-2xl p-6 border border-amber-200 shadow-sm bg-gradient-to-br from-white to-amber-50/30">
