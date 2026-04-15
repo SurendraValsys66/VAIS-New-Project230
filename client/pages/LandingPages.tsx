@@ -3,9 +3,10 @@ import { useNavigate } from "react-router-dom";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { BuilderCanvas } from "@/components/builder/Canvas";
 import { Button } from "@/components/ui/button";
-import { Plus, Layout, Search, Sparkles } from "lucide-react";
+import { Plus, Layout, Search, Sparkles, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -53,6 +54,10 @@ export default function LandingPages() {
   const [view, setView] = useState<View>("list");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All Categories");
+  const [selectedSidebarCategories, setSelectedSidebarCategories] = useState<
+    Set<string>
+  >(new Set());
+  const [showSidebarMobile, setShowSidebarMobile] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<PageData | null>(null);
   const [pages, setPages] = useState<PageData[]>([
     {
@@ -85,6 +90,17 @@ export default function LandingPages() {
     },
   ]);
 
+  // Count templates by category
+  const categoryCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    CATEGORIES.forEach((cat) => {
+      if (cat !== "All Categories") {
+        counts[cat] = pages.filter((p) => p.category === cat).length;
+      }
+    });
+    return counts;
+  }, [pages]);
+
   const filteredPages = useMemo(() => {
     return pages.filter((page) => {
       const matchesCategory =
@@ -95,6 +111,23 @@ export default function LandingPages() {
       return matchesCategory && matchesSearch;
     });
   }, [pages, selectedCategory, searchQuery]);
+
+  const handleSidebarCategoryChange = (category: string) => {
+    const newSet = new Set(selectedSidebarCategories);
+    if (newSet.has(category)) {
+      newSet.delete(category);
+    } else {
+      newSet.add(category);
+    }
+    setSelectedSidebarCategories(newSet);
+    // Update main dropdown if single category is selected
+    if (newSet.size === 1) {
+      const selected = Array.from(newSet)[0];
+      setSelectedCategory(selected);
+    } else if (newSet.size === 0) {
+      setSelectedCategory("All Categories");
+    }
+  };
 
   const handleCreateNew = () => {
     setSelectedTemplate(null);
@@ -126,18 +159,89 @@ export default function LandingPages() {
   return (
     <DashboardLayout>
       <div className="flex h-full gap-0">
+        {/* Sidebar */}
+        <div
+          className={`${
+            showSidebarMobile ? "fixed inset-0 z-50 bg-black/50" : "hidden lg:flex"
+          } lg:static lg:bg-transparent lg:flex-col lg:w-64 bg-white shadow-lg lg:shadow-none`}
+        >
+          <div className="flex-1 overflow-auto p-6">
+            {/* Close button for mobile */}
+            {showSidebarMobile && (
+              <button
+                onClick={() => setShowSidebarMobile(false)}
+                className="lg:hidden absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-lg"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            )}
+
+            <h3 className="text-lg font-bold text-purple-600 mb-6">Categories</h3>
+            <div className="space-y-3">
+              {CATEGORIES.filter((cat) => cat !== "All Categories").map(
+                (category) => (
+                  <div
+                    key={category}
+                    className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+                    onClick={() => handleSidebarCategoryChange(category)}
+                  >
+                    <div className="flex items-center gap-3 flex-1">
+                      <Checkbox
+                        checked={selectedSidebarCategories.has(category)}
+                        onCheckedChange={() =>
+                          handleSidebarCategoryChange(category)
+                        }
+                      />
+                      <label className="text-sm text-gray-900 cursor-pointer font-medium">
+                        {category}
+                      </label>
+                    </div>
+                    <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                      {categoryCounts[category] || 0}
+                    </span>
+                  </div>
+                )
+              )}
+            </div>
+          </div>
+        </div>
+
         {/* Main Content */}
         <div className="flex-1 overflow-auto">
           <div className="space-y-8">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900 tracking-tight flex items-center gap-3">
-                  <div className="w-10 h-10 bg-valasys-orange rounded-xl flex items-center justify-center text-white shadow-lg">
-                    <Layout className="w-6 h-6" />
-                  </div>
-                  Landing Pages
-                </h1>
-                <p className="text-gray-500 mt-1">Design, build and publish high-converting pages in minutes.</p>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setShowSidebarMobile(!showSidebarMobile)}
+                  className="lg:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  {showSidebarMobile ? (
+                    <X className="w-5 h-5" />
+                  ) : (
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M4 6h16M4 12h16M4 18h16"
+                      />
+                    </svg>
+                  )}
+                </button>
+                <div>
+                  <h1 className="text-2xl font-bold text-gray-900 tracking-tight flex items-center gap-3">
+                    <div className="w-10 h-10 bg-valasys-orange rounded-xl flex items-center justify-center text-white shadow-lg">
+                      <Layout className="w-6 h-6" />
+                    </div>
+                    Landing Pages
+                  </h1>
+                  <p className="text-gray-500 mt-1">Design, build and publish high-converting pages in minutes.</p>
+                </div>
               </div>
               <div className="flex gap-3 justify-end">
                 <Button onClick={handleAIBuilder} className="px-6 py-6 rounded-2xl shadow-md hover:shadow-lg transition-all font-bold text-base group bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white">
